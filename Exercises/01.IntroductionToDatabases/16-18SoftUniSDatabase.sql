@@ -1,3 +1,4 @@
+-- 16 Softuni Database
 CREATE DATABASE SoftUni;
 USE SoftUni
 
@@ -17,7 +18,7 @@ CREATE TABLE Addresses
 CREATE TABLE Departments 
 (
 	Id INT PRIMARY KEY IDENTITY(1,1),
-	[Name]  NVARCHAR(100) NOT NULL,
+	[Name] VARCHAR(50) NOT NULL,
 );
 
 CREATE TABLE Employees 
@@ -32,3 +33,8 @@ CREATE TABLE Employees
 	Salary DECIMAL(6,2),
 	AddressId INT FOREIGN KEY (AddressId) REFERENCES Addresses(Id)
 );
+
+-- 17 Backup Database
+USE SoftUni
+BACKUP DATABASE SoftUni
+TO DISK = 'H:\backups\softuni-backup.bak';
