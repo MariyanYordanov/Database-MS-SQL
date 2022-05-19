@@ -37,24 +37,6 @@
           <AssociatedConnUserName />
           <FullPath>25- All-Diablo-Characters.sql</FullPath>
         </FileNode>
-        <FileNode Name="Add-Database-Diablo.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:EXECUTOR:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>EXECUTOR</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>Add-Database-Diablo.sql</FullPath>
-        </FileNode>
-        <FileNode Name="Add-Database-Geography.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:EXECUTOR:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>EXECUTOR</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>Add-Database-Geography.sql</FullPath>
-        </FileNode>
-        <FileNode Name="Add-Database-SoftUni.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:EXECUTOR:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>EXECUTOR</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>Add-Database-SoftUni.sql</FullPath>
-        </FileNode>
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">
