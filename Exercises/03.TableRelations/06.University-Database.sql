@@ -14,7 +14,7 @@ CREATE TABLE [Majors]
 	[Name] VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE [StudentS]
+CREATE TABLE [Students]
 (
 	[StudentID] INT PRIMARY KEY IDENTITY,
 	[StudentNumber] CHAR(10) NOT NULL,
