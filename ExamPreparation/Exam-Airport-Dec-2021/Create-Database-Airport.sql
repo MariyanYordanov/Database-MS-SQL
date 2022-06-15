@@ -196,13 +196,11 @@ LEFT JOIN Aircraft AS ac ON ac.Id = fd.AircraftId
  GO
 
  -- 12. Full Info for Airports
- CREATE OR ALTER PROC usp_SearchByAirportName (@airportName VARCHAR(70))
+ CREATE PROC usp_SearchByAirportName (@airportName VARCHAR(70))
  AS
- BEGIN 
-		    
-
-		 SELECT @airportName AS AirportName,
-			    p.FullName,
+ BEGIN
+			   SELECT AirportName,
+			          p.FullName,
 			     CASE
 		         WHEN fd.TicketPrice <= 400 THEN 'Low'
 		         WHEN fd.TicketPrice BETWEEN 401 AND 1500  THEN 'Medium'
@@ -216,6 +214,8 @@ LEFT JOIN Aircraft AS ac ON ac.Id = fd.AircraftId
     LEFT JOIN Passengers AS p ON p.Id = fd.PassengerId
     LEFT JOIN Aircraft AS ac ON ac.Id = fd.AircraftId
     LEFT JOIN AircraftTypes AS acty ON acty.Id = ac.TypeId
+	WHERE AirportName = @airportName
+	ORDER BY Manufacturer,Fullname
  END
 
  GO
