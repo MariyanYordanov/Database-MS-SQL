@@ -1,1 +1,2 @@
-# Relational database with T-SQL ADO.NET and Entity Core Framework
+# Relational database with T-SQL 
+# ADO.NET and Entity Core Framework
