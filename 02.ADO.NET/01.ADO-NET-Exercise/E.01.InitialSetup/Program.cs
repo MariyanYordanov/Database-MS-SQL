@@ -317,6 +317,34 @@ namespace E._01.InitialSetup
 
             return output.ToString().TrimEnd();
         }
+
+
+        // 9.Increase Age Stored Procedure 
+        private static string IncreaseMinionAge(SqlConnection sqlConnection, int minionId)
+        {
+            StringBuilder output = new StringBuilder();
+
+            string increaseAgeQuery = @"EXEC [dbo].[usp_GetOlder] @MinionId";
+            SqlCommand increaseAgeCmd = new SqlCommand(increaseAgeQuery, sqlConnection);
+            increaseAgeCmd.Parameters.AddWithValue("@MinionId", minionId);
+
+            increaseAgeCmd.ExecuteNonQuery();
+
+            string minionInfoQuery = @"SELECT [Name],
+                                              [Age]
+                                         FROM [Minions]
+                                        WHERE [Id] = @MinionId";
+            SqlCommand minionInfoCmd = new SqlCommand(minionInfoQuery, sqlConnection);
+            minionInfoCmd.Parameters.AddWithValue("@MinionId", minionId);
+
+            using SqlDataReader infoReader = minionInfoCmd.ExecuteReader();
+            while (infoReader.Read())
+            {
+                output.AppendLine($"{infoReader["Name"]} – {infoReader["Age"]} years old");
+            }
+
+            return output.ToString().TrimEnd();
+        }
     }
 
     
