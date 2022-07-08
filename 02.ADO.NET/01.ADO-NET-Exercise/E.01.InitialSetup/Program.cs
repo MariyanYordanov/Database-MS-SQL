@@ -259,5 +259,65 @@ namespace E._01.InitialSetup
 
             return minionId;
         }
+
+
+        // 6.*Remove Villain
+
+        private static string DeleteVillain(SqlConnection sqlConnection, int villainId)
+        {
+            StringBuilder output = new StringBuilder();
+
+            string villainNameQuery = @"SELECT [Name]
+                                          FROM [Villains]
+                                         WHERE [Id] = @VillainId";
+            SqlCommand villainNameCmd = new SqlCommand(villainNameQuery, sqlConnection);
+            villainNameCmd.Parameters.AddWithValue("@VillainId", villainId);
+
+            string villainName = (string)villainNameCmd.ExecuteScalar();
+            if (villainName == null)
+            {
+                return $"No such villain was found.";
+            }
+
+            SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
+            try
+            {
+                string releaseMinionsQuery = @"DELETE FROM [MinionsVillains]
+                                                 WHERE [VillainId] = @VillainId";
+                SqlCommand releaseMinionsCmd =
+                    new SqlCommand(releaseMinionsQuery, sqlConnection, sqlTransaction);
+                releaseMinionsCmd.Parameters.AddWithValue("@VillainId", villainId);
+
+                int minionsReleased = releaseMinionsCmd.ExecuteNonQuery();
+
+                string deleteVillainQuery = @"DELETE FROM [Villains]
+                                                WHERE [Id] = @VillainId";
+                SqlCommand deleteVillainCmd =
+                    new SqlCommand(deleteVillainQuery, sqlConnection, sqlTransaction);
+                deleteVillainCmd.Parameters.AddWithValue("@VillainId", villainId);
+
+                int villainsDeleted = deleteVillainCmd.ExecuteNonQuery();
+
+                if (villainsDeleted != 1)
+                {
+                    sqlTransaction.Rollback();
+                }
+
+                output
+                    .AppendLine($"{villainName} was deleted.")
+                    .AppendLine($"{minionsReleased} minions were released.");
+            }
+            catch (Exception e)
+            {
+                sqlTransaction.Rollback();
+                return e.ToString();
+            }
+
+            sqlTransaction.Commit();
+
+            return output.ToString().TrimEnd();
+        }
     }
+
+    
 }
