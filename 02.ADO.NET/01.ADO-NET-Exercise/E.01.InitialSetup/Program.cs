@@ -8,19 +8,21 @@ namespace E._01.InitialSetup
     {
         static void Main(string[] args)
         {
-            int villainsId = int.Parse(Console.ReadLine());
+            //int villainsId = int.Parse(Console.ReadLine()); -> input for 3.Minion Names
 
             using SqlConnection sqlConnection = new SqlConnection(Config.ConnectionString);
 
             sqlConnection.Open();
-            string result = GetAllMinionsNamePerVillain(sqlConnection, villainsId);
+            //string result = GetVillainsWithMinionsCount(sqlConnection); -> output for 2.Villain Names
+            //string result = GetAllMinionsNamePerVillain(sqlConnection, villainsId); -> output for 3.Minion Names
+
             Console.WriteLine(result);
 
             sqlConnection.Close();
         }
 
 
-        //2.Villain Names
+        // 2.Villain Names
 
         /// <summary>
         /// Take an open sql connection, connects to the database and returns all villains with muinions
@@ -57,12 +59,13 @@ namespace E._01.InitialSetup
 
 
         // 3.Minion Names
+
         /// <summary>
-        /// 
+        /// Find all minions per each vallains
         /// </summary>
-        /// <param name="sqlConnection"></param>
-        /// <param name="villainId"></param>
-        /// <returns></returns>
+        /// <param name="sqlConnection">Open SQL Connection</param>
+        /// <param name="villainId">Integer value villains id</param>
+        /// <returns>String as result</returns>
         private static string GetAllMinionsNamePerVillain(SqlConnection sqlConnection, int villainId)
         {
             StringBuilder output = new StringBuilder();
@@ -118,6 +121,13 @@ namespace E._01.InitialSetup
             minionsReader.Close();
 
             return output.ToString().TrimEnd();
+        }
+
+        // 4.Add Minion
+
+        private static string AddMinions()
+        {
+
         }
     }
 }
