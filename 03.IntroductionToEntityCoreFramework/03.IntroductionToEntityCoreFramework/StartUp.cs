@@ -11,7 +11,7 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = GetEmployeesWithSalaryOver50000(dataContext);
+            var result = GetEmployeesFromResearchAndDevelopment(dataContext);
             Console.WriteLine(result);
         }
 
@@ -58,6 +58,37 @@ namespace SoftUni
             foreach (var employee in employees)
             {
                 sb.AppendLine($"{employee.FirstName} - {employee.Salary:f2}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        // 5.Employees from Research and Development
+        // Extract all employees from the Research and Development department.
+        // Order them by salary (in ascending order), then by first name (in descending order).
+        // Return only their first name, last name, department name and salary rounded to 2 symbols,
+        // after the decimal separator in the format shown below: 
+        // Gigi Matthew from Research and Development - $40900.00
+        public static string GetEmployeesFromResearchAndDevelopment(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Select(e => new
+                {
+                    e.DepartmentId,
+                    e.FirstName,
+                    e.LastName,
+                    e.Salary,
+                    e.Departments
+                })
+                .Where(e => e.DepartmentId == 6)
+                .OrderBy(e => e.Salary)
+                .ThenByDescending(e => e.FirstName);
+                
+            var sb = new StringBuilder();
+
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.FirstName} {employee.LastName} from Research and Development - ${employee.Salary:f2}");
             }
 
             return sb.ToString().TrimEnd();
