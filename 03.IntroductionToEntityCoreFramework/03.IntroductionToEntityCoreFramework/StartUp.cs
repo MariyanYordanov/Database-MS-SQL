@@ -11,10 +11,11 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = GetEmployeesFullInformation(dataContext);
+            var result = GetEmployeesWithSalaryOver50000(dataContext);
             Console.WriteLine(result);
         }
 
+        // 3.Employees Full Information
         public static string GetEmployeesFullInformation(SoftUniContext context)
         {
             var emploeeInfo = context.Employees
@@ -39,6 +40,31 @@ namespace SoftUni
             var result = sb.ToString().TrimEnd();
             
             return result;
+        }
+
+        // 4.Employees with Salary Over 50 000
+        // Your task is to extract all employees with salary over 50000.
+        // Return their first names and salaries in format “{firstName} - {salary}”.
+        // Salary must be rounded to 2 symbols, after the decimal separator.
+        // Sort them alphabetically by first name.
+        public static string GetEmployeesWithSalaryOver50000(SoftUniContext context) 
+        {
+            var employees = context.Employees
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.Salary
+                })
+                .Where(e => e.Salary >= 50000)
+                .OrderBy(e => e.FirstName)
+                .ToList();
+            var sb = new StringBuilder();
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.FirstName} - {employee.Salary:f2}");
+            }
+
+            return sb.ToString().TrimEnd();
         }
     }
 }
