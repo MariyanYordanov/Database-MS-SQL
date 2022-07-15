@@ -7,7 +7,7 @@ namespace SoftUni.Models
     {
         public Project()
         {
-            EmployeesProjects = new HashSet<EmployeesProject>();
+            EmployeesProjects = new HashSet<EmployeeProject>();
         }
 
         public int ProjectId { get; set; }
@@ -16,6 +16,6 @@ namespace SoftUni.Models
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        public virtual ICollection<EmployeesProject> EmployeesProjects { get; set; }
+        public virtual ICollection<EmployeeProject> EmployeesProjects { get; set; }
     }
 }
