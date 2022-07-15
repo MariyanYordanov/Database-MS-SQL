@@ -1,4 +1,5 @@
 ﻿using SoftUni.Data;
+using SoftUni.Models;
 using System;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = GetEmployeesFromResearchAndDevelopment(dataContext);
+            var result = AddNewAddressToEmployee(dataContext);
             Console.WriteLine(result);
         }
 
@@ -86,6 +87,41 @@ namespace SoftUni
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        // 6.Adding a New Address and Updating Employee
+        public static string AddNewAddressToEmployee(SoftUniContext context)
+        {
+            Employee nakov = context.Employees
+                .FirstOrDefault(e => e.LastName == "Nakov");
+
+            if (nakov != null) 
+            {
+                nakov.Address = new Address
+                {
+                    AddressText = "Vitoshka 15",
+                    TownId = 4,
+                };
+            }
+
+            context.SaveChanges();
+
+            var addresses = context.Employees
+                .Select(e => new 
+                { 
+                    e.Address.AddressText, 
+                    e.Address.AddressId, 
+                })
+                .OrderByDescending(e => e.AddressId)
+                .Take(10);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var currentAddress in addresses)
+            {
+                stringBuilder.AppendLine($"{currentAddress.AddressText}");
+            }
+
+            return stringBuilder.ToString().TrimEnd();
         }
     }
 }
