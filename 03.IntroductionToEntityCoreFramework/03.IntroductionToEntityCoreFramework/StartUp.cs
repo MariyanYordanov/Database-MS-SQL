@@ -43,10 +43,6 @@ namespace SoftUni
         }
 
         // 4.Employees with Salary Over 50 000
-        // Your task is to extract all employees with salary over 50000.
-        // Return their first names and salaries in format “{firstName} - {salary}”.
-        // Salary must be rounded to 2 symbols, after the decimal separator.
-        // Sort them alphabetically by first name.
         public static string GetEmployeesWithSalaryOver50000(SoftUniContext context) 
         {
             var employees = context.Employees
@@ -55,7 +51,7 @@ namespace SoftUni
                     e.FirstName,
                     e.Salary
                 })
-                .Where(e => e.Salary >= 50000)
+                .Where(e => e.Salary > 50000)
                 .OrderBy(e => e.FirstName)
                 .ToList();
             var sb = new StringBuilder();
