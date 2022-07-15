@@ -2,6 +2,6 @@
 {
     public static class Config
     {
-        public static string ConnectionString = @"Server=EXECUTOR;Database=MinionsDB;Integrated Security=True;";
+        public static string ConnectionString = @"Server=DESKTOP-UK85UL9;Database=MinionsDB;Integrated Security=True;";
     }
 }
