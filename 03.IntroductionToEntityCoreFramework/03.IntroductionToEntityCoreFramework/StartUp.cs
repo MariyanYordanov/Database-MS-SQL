@@ -127,12 +127,6 @@ namespace SoftUni
         }
 
         // 7.Employees and Projects
-        // Find the first 10 employees who have projects started in the period 2001 - 2003 (inclusive).
-        // Print each employee's first name, last name, manager’s first name and last name.
-        // Then return all of their projects in the format "--<ProjectName> - <StartDate> - <EndDate>", each on a new row.
-        // If a project has no end date, print "not finished"
-        // Constraints
-        // Use date format: "M/d/yyyy h:mm:ss tt".
         public static string GetEmployeesInPeriod(SoftUniContext context)
         {
             var employees = context.Employees
