@@ -1,6 +1,8 @@
-﻿using SoftUni.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SoftUni.Data;
 using SoftUni.Models;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -12,7 +14,7 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = AddNewAddressToEmployee(dataContext);
+            var result = GetEmployeesInPeriod(dataContext);
             Console.WriteLine(result);
         }
 
@@ -122,6 +124,57 @@ namespace SoftUni
             }
 
             return stringBuilder.ToString().TrimEnd();
+        }
+
+        // 7.Employees and Projects
+        // Find the first 10 employees who have projects started in the period 2001 - 2003 (inclusive).
+        // Print each employee's first name, last name, manager’s first name and last name.
+        // Then return all of their projects in the format "--<ProjectName> - <StartDate> - <EndDate>", each on a new row.
+        // If a project has no end date, print "not finished"
+        // Constraints
+        // Use date format: "M/d/yyyy h:mm:ss tt".
+        public static string GetEmployeesInPeriod(SoftUniContext context)
+        {
+            var employees = context.Employees
+                 .Include(e => e.EmployeesProjects)
+                 .ThenInclude(e => e.Project)
+                 .Where(e => e.EmployeesProjects.Any(p => p.Project.StartDate.Year >= 2001 
+                                                       && p.Project.StartDate.Year <= 2003))
+                 .Select(e => new
+                 {
+                     EmployeeFirstName = e.FirstName,
+                     EmployeeLastName = e.LastName,
+                     ManagerFirstName = e.Manager.FirstName,
+                     ManagerLastName = e.Manager.LastName,
+                     Projects = e.EmployeesProjects
+                                 .Select(p => new 
+                                 { 
+                                     ProjectName = p.Project.Name,
+                                     EndDate = p.Project.EndDate,
+                                     StartDate = p.Project.StartDate,
+                                 })
+                 })
+                 .Take(10)
+                 .ToList();
+
+            var sb = new StringBuilder();
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.EmployeeFirstName} {employee.EmployeeLastName}" +
+                    $" - Manager: {employee.ManagerFirstName} {employee.ManagerLastName}");
+                foreach (var project in employee.Projects)
+                {
+                    var endDate = project.EndDate.HasValue 
+                        ? project.EndDate.Value
+                        .ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture) 
+                        : "not finished";
+                    sb.AppendLine($"--{project.ProjectName} - " +
+                        $"{project.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)}" +
+                        $" - {endDate}");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
         }
     }
 }
