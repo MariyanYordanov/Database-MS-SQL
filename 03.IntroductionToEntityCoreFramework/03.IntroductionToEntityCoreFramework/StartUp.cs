@@ -14,7 +14,7 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = GetLatestProjects(dataContext);
+            var result = IncreaseSalaries(dataContext);
             Console.WriteLine(result);
         }
 
@@ -262,7 +262,6 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
 
-
         // 11.Find Latest 10 Projects
         public static string GetLatestProjects(SoftUniContext context)
         {
@@ -284,6 +283,30 @@ namespace SoftUni
                 sb.AppendLine($"{project.Name}");
                 sb.AppendLine($"{project.Description}");
                 sb.AppendLine($"{project.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        // 12.Increase Salaries
+        public static string IncreaseSalaries(SoftUniContext context)
+        {
+            string[] departmentsToIncreaseSalary = new string[] { "Engineering", "Tool Design", "Marketing", "Information Services" };
+            var employees = context.Employees
+                .Where(e => departmentsToIncreaseSalary.Contains(e.Department.Name))
+                .OrderBy(e => e.FirstName)
+                .ThenBy(e => e.LastName)
+                .ToList();
+
+            foreach (var employee in employees)
+            {
+                employee.Salary *= 1.12m;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.FirstName} {employee.LastName} (${employee.Salary:f2})");
             }
 
             return sb.ToString().TrimEnd();
