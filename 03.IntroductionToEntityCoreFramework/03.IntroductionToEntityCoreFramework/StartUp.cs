@@ -14,7 +14,7 @@ namespace SoftUni
         static void Main(string[] args)
         {
             var dataContext = new SoftUniContext();
-            var result = IncreaseSalaries(dataContext);
+            var result = DeleteProjectById(dataContext);
             Console.WriteLine(result);
         }
 
@@ -303,10 +303,63 @@ namespace SoftUni
                 employee.Salary *= 1.12m;
             }
 
+            context.SaveChanges();
+
             StringBuilder sb = new StringBuilder();
             foreach (var employee in employees)
             {
                 sb.AppendLine($"{employee.FirstName} {employee.LastName} (${employee.Salary:f2})");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        // 13.Find Employees by First Name Starting with "Sa"
+        public static string GetEmployeesByFirstNameStartingWithSa(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Where(e => e.FirstName.StartsWith("Sa"))
+                .Select(e => new 
+                {
+                    e.FirstName,
+                    e.LastName,
+                    e.JobTitle,
+                    e.Salary
+                })
+                .OrderBy(e => e.FirstName)
+                .ThenBy(e => e.LastName)
+                .ToList();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle} - (${employee.Salary:f2})");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        // 14.Delete Project by Id
+        public static string DeleteProjectById(SoftUniContext context)
+        {
+            var projectToFind = context.Projects.Find(2);
+            var employeeProject = context.EmployeesProjects
+                .Where(ep => ep.ProjectId == 2);
+
+            context.EmployeesProjects
+                .ToList()
+                .ForEach(ep => context.EmployeesProjects.Remove(ep));
+
+            context.Projects.Remove(projectToFind);
+
+            context.SaveChanges();
+
+            var projects = context.Projects.Take(10).ToList();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var project in projects)
+            {
+                sb.AppendLine($"{project.Name}");
             }
 
             return sb.ToString().TrimEnd();
