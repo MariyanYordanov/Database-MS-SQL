@@ -28,7 +28,7 @@ namespace MusicHub.Data.Models
             => this.Songs.Count > 0 ? this.Songs.Sum(x => x.Price) : 0m;
 
         [ForeignKey(nameof(Producer))]
-        public int ProducerId { get; set; }
+        public int? ProducerId { get; set; }
         public Producer Producer { get; set; }
 
         public virtual ICollection<Song> Songs { get; set; }
