@@ -18,7 +18,7 @@
 
             string input = Console.ReadLine();
 
-            Console.WriteLine(GetBooksReleasedBefore(context, input));
+            Console.WriteLine(GetAuthorNamesEndingIn(context, input));
         }
 
         // 2.Age Restriction
@@ -133,6 +133,30 @@
             foreach (var book in books)
             {
                 output.AppendLine($"{book.Title} - {book.EditionType} - ${book.Price:f2}");
+            }
+
+            return output.ToString().TrimEnd();
+        }
+
+        // 8.Author Search
+        public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
+        {
+            var authors = context.Authors
+                .Where(x => x.FirstName.EndsWith(input))
+                .Select(x => new
+                {
+                    x.FirstName,
+                    x.LastName
+                })
+                .OrderBy(x => x.FirstName)
+                .ThenBy(x => x.LastName)
+                .ToList();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var author in authors)
+            {
+                output.AppendLine($"{author.FirstName} {author.LastName}");
             }
 
             return output.ToString().TrimEnd();
