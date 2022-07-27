@@ -13,8 +13,10 @@
         {
             using var context = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
-            
-            Console.WriteLine(GetGoldenBooks(context));
+
+            int input = int.Parse(Console.ReadLine());
+
+            Console.WriteLine(GetBooksNotReleasedIn(context, input));
         }
 
         // 2.Age Restriction
@@ -69,6 +71,24 @@
             foreach (var book in books)
             {
                 output.AppendLine($"{book.Title} - ${book.Price:f2}");
+            }
+
+            return output.ToString().TrimEnd();
+        }
+
+        // 5.Not Released In
+        public static string GetBooksNotReleasedIn(BookShopContext context, int year)
+        {
+            var books = context.Books
+                .Where(b => b.ReleaseDate.Value.Year != year)
+                .OrderBy(t => t)
+                .ToArray();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var book in books)
+            {
+                output.AppendLine(book.Title);
             }
 
             return output.ToString().TrimEnd();
