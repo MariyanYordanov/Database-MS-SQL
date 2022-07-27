@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using BookShop.Models.Enums;
+    using Microsoft.EntityFrameworkCore;
 
     public class StartUp
     {
@@ -14,9 +15,9 @@
             using var context = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            int input = int.Parse(Console.ReadLine());
+            string input = Console.ReadLine();
 
-            Console.WriteLine(GetBooksNotReleasedIn(context, input));
+            Console.WriteLine(GetBooksByCategory(context, input));
         }
 
         // 2.Age Restriction
@@ -93,5 +94,20 @@
 
             return output.ToString().TrimEnd();
         }
+
+        // 6.Book Titles by Category
+        public static string GetBooksByCategory(BookShopContext context, string input)
+        {
+            var categories = input.ToLower().Split(' ');
+
+            var bookTitles = context.Books
+                .Where(b => b.BookCategories.Any(x => categories.Contains(x.Category.Name.ToLower())))
+                .Select(b => b.Title)
+                .OrderBy(x => x)
+                .ToArray();
+
+            return String.Join(Environment.NewLine, bookTitles);
+        }
+
     }
 }
