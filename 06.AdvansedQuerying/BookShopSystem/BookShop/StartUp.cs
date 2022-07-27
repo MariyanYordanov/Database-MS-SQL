@@ -16,9 +16,7 @@
             using var context = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            string input = Console.ReadLine();
-
-            Console.WriteLine(GetBooksByAuthor(context, input));
+            Console.WriteLine(CountCopiesByAuthor(context));
         }
 
         // 2.Age Restriction
@@ -194,6 +192,33 @@
             foreach (var book in books)
             {
                 output.AppendLine($"{book.Title} ({book.AuthorFirstName} {book.AuthorLastName})");
+            }
+
+            return output.ToString().TrimEnd();
+        }
+
+        // 11.Count Books
+        public static int CountBooks(BookShopContext context, int lengthCheck) => context.Books.Count(b => b.Title.Length > lengthCheck);
+
+        // 12.Total Book Copies
+        public static string CountCopiesByAuthor(BookShopContext context)
+        {
+            var authors = context.Authors
+                    .Select(a => new
+                    {
+                        a.FirstName,
+                        a.LastName,
+                        AuthorBoks = a.Books.Sum(b => b.Copies)
+                    })
+                    .OrderByDescending(a => a.AuthorBoks)
+                    .ToList();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var author in authors)
+            {
+                
+                output.AppendLine($"{author.FirstName} {author.LastName} - {author.AuthorBoks}");
             }
 
             return output.ToString().TrimEnd();
