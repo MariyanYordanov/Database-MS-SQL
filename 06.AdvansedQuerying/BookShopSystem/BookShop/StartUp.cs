@@ -16,7 +16,7 @@
             using var context = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            Console.WriteLine(GetTotalProfitByCategory(context));
+            Console.WriteLine(GetMostRecentBooks(context));
         }
 
         // 2.Age Restriction
@@ -242,6 +242,38 @@
             foreach (var prof in profit)
             {
                 output.AppendLine($"{prof.CategoryName} ${prof.Profit:f2}");
+            }
+
+            return output.ToString().TrimEnd();
+        }
+
+        // 14.Most Recent Books
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var categories = context.Categories
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    TopThree = c.CategoryBooks
+                        .OrderByDescending(b => b.Book.ReleaseDate)
+                        .Take(3)
+                        .Select(rd => new 
+                        { 
+                            ReleaseDate = rd.Book.ReleaseDate.Value.Year,
+                            BookTitle = rd.Book.Title
+                        })
+                        .ToList(),
+                })
+                .OrderBy(c => c.CategoryName)
+                .ToArray();
+            StringBuilder output = new StringBuilder();
+            foreach (var book in categories)
+            {
+                output.AppendLine($"--{book.CategoryName}");
+                foreach (var item in book.TopThree)
+                {
+                    output.AppendLine($"{item.BookTitle} ({item.ReleaseDate})");
+                }
             }
 
             return output.ToString().TrimEnd();
