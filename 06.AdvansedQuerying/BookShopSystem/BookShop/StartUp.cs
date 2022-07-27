@@ -54,5 +54,24 @@
 
             return output.ToString().TrimEnd();
         }
+
+        // 4.Books by Price
+        public static string GetBooksByPrice(BookShopContext context)
+        {
+            var books = context.Books
+                .Where(b => b.Price > 40)
+                .Select(b => new { b.Price, b.Title })
+                .OrderByDescending(b => b.Price)
+                .ToList();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var book in books)
+            {
+                output.AppendLine($"{book.Title} - ${book.Price:f2}");
+            }
+
+            return output.ToString().TrimEnd();
+        }
     }
 }
