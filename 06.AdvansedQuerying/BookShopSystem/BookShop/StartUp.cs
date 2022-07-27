@@ -18,7 +18,7 @@
 
             string input = Console.ReadLine();
 
-            Console.WriteLine(GetBookTitlesContaining(context, input));
+            Console.WriteLine(GetBooksByAuthor(context, input));
         }
 
         // 2.Age Restriction
@@ -171,6 +171,32 @@
                 .OrderBy(t => t)
                 .ToArray();
             return String.Join(Environment.NewLine, books);
+        }
+
+        // 10.Book Search by Author
+        public static string GetBooksByAuthor(BookShopContext context, string input)
+        {
+            // The Heart Is Deceitful Above All Things (Bozhidara Rysinova)
+            var books = context.Books
+                .Where(b => b.Author.LastName.ToLower().StartsWith(input.ToLower()))
+                .Select(b => new
+                {
+                    b.BookId,
+                    b.Title,
+                    AuthorFirstName = b.Author.FirstName,
+                    AuthorLastName = b.Author.LastName
+                })
+                .OrderBy(b => b.BookId)
+                .ToArray();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var book in books)
+            {
+                output.AppendLine($"{book.Title} ({book.AuthorFirstName} {book.AuthorLastName})");
+            }
+
+            return output.ToString().TrimEnd();
         }
     }
 }
