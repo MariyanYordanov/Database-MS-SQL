@@ -7,6 +7,7 @@
     using System.Text;
     using BookShop.Models.Enums;
     using Microsoft.EntityFrameworkCore;
+    using System.Globalization;
 
     public class StartUp
     {
@@ -17,7 +18,7 @@
 
             string input = Console.ReadLine();
 
-            Console.WriteLine(GetBooksByCategory(context, input));
+            Console.WriteLine(GetBooksReleasedBefore(context, input));
         }
 
         // 2.Age Restriction
@@ -109,5 +110,32 @@
             return String.Join(Environment.NewLine, bookTitles);
         }
 
+        // 7.Released Before Date
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            var targetDate = DateTime
+                .ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+            var books = context.Books
+                .Where(b => b.ReleaseDate < targetDate)
+                .Select(b => new
+                {
+                    b.Title,
+                    b.EditionType,
+                    b.Price,
+                    b.ReleaseDate
+                })
+                .OrderByDescending(b => b.ReleaseDate)
+                .ToList();
+
+            StringBuilder output = new StringBuilder();
+
+            foreach (var book in books)
+            {
+                output.AppendLine($"{book.Title} - {book.EditionType} - ${book.Price:f2}");
+            }
+
+            return output.ToString().TrimEnd();
+        }
     }
 }
