@@ -18,7 +18,7 @@
 
             string input = Console.ReadLine();
 
-            Console.WriteLine(GetAuthorNamesEndingIn(context, input));
+            Console.WriteLine(GetBookTitlesContaining(context, input));
         }
 
         // 2.Age Restriction
@@ -160,6 +160,17 @@
             }
 
             return output.ToString().TrimEnd();
+        }
+
+        // 9.Book Search
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            var books = context.Books
+                .Where(b => b.Title.ToLower().Contains(input.ToLower()))
+                .Select(b => b.Title)
+                .OrderBy(t => t)
+                .ToArray();
+            return String.Join(Environment.NewLine, books);
         }
     }
 }
