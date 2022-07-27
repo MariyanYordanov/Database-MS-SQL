@@ -8,15 +8,20 @@
     using BookShop.Models.Enums;
     using Microsoft.EntityFrameworkCore;
     using System.Globalization;
+    using BookShop.Models;
+    using System.Diagnostics;
 
     public class StartUp
     {
         public static void Main()
         {
             using var context = new BookShopContext();
-            //DbInitializer.ResetDatabase(db);
+            DbInitializer.ResetDatabase(context);
 
-            Console.WriteLine(GetMostRecentBooks(context));
+            Stopwatch sw = Stopwatch.StartNew();
+            //IncreasePrices(context);
+
+            Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         // 2.Age Restriction
@@ -277,6 +282,19 @@
             }
 
             return output.ToString().TrimEnd();
+        }
+
+        // 15.Increase Prices
+        public static void IncreasePrices(BookShopContext context)
+        {
+            IQueryable<Book> books = context.Books
+                .Where(b => b.ReleaseDate.Value.Year < 2010);
+            foreach (Book book in books)
+            {
+                book.Price += 5;
+            }
+
+            context.SaveChanges();
         }
     }
 }
