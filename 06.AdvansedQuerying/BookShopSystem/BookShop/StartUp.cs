@@ -19,7 +19,7 @@
             DbInitializer.ResetDatabase(context);
 
             Stopwatch sw = Stopwatch.StartNew();
-            //IncreasePrices(context);
+            IncreasePrices(context);
 
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
