@@ -9,11 +9,15 @@ using ProductShop.DTOs.User;
 using ProductShop.Models;
 using System.ComponentModel.DataAnnotations;
 using ProductShop.DTOs.Product;
+using ProductShop.DTOs.Category;
+using ProductShop.DTOs.CategoryProduct;
 
 namespace ProductShop
 {
     public class StartUp
     {
+        public static object ImportCategoryProductsDto { get; private set; }
+
         public static void Main(string[] args)
         {
             Mapper.Initialize(cfg => {
@@ -22,14 +26,14 @@ namespace ProductShop
 
             ProductShopContext dbContext = new ProductShopContext();
 
-            string inputJson = File.ReadAllText("../../../Datasets/products.json");
+            string inputJson = File.ReadAllText("../../../Datasets/categories-products.json");
 
             //dbContext.Database.EnsureDeleted();
             //dbContext.Database.EnsureCreated();
 
             //Console.WriteLine("Datababe copy was created!");
 
-            string output = ImportProducts(dbContext, inputJson);
+            string output = ImportCategoryProducts(dbContext, inputJson);
             Console.WriteLine(output);
         }
 
@@ -77,6 +81,56 @@ namespace ProductShop
             context.SaveChanges();
 
             return $"Successfully imported {validProducts.Count}";
+        }
+
+        // Query 3.Import Categories
+        public static string ImportCategories(ProductShopContext context, string inputJson)
+        {
+            ImportCategoryDto[] categoryDtos = JsonConvert.DeserializeObject<ImportCategoryDto[]>(inputJson);
+            ICollection<Category> validCategories = new List<Category>();
+            foreach (ImportCategoryDto categoryDto in categoryDtos)
+            {
+                if (!IsAttributeValid(categoryDto))
+                {
+                    continue;
+                }
+
+                Category category = Mapper.Map<Category>(categoryDto);
+                validCategories.Add(category);
+            }
+
+            context.AddRange(validCategories);
+            context.SaveChanges();
+
+            return $"Successfully imported {validCategories.Count}";
+        }
+
+        // Query 4.Import Categories and Products
+        public static string ImportCategoryProducts(ProductShopContext context, string inputJson)
+        {
+            ImportCategoryProductDto[] categoryProductsDtos = JsonConvert.DeserializeObject<ImportCategoryProductDto[]>(inputJson);
+            ICollection<CategoryProduct> validCategoriesProducts = new List<CategoryProduct>();
+            foreach (ImportCategoryProductDto categoryProductsDto in categoryProductsDtos)
+            {
+                if (!IsAttributeValid(categoryProductsDto))
+                {
+                    continue;
+                }
+
+                CategoryProduct categoryProduct = Mapper.Map<CategoryProduct>(categoryProductsDto);
+                validCategoriesProducts.Add(categoryProduct);
+            }
+
+            context.AddRange(validCategoriesProducts);
+            context.SaveChanges();
+
+            return $"Successfully imported {validCategoriesProducts.Count}";
+        }
+
+        // Query 5. Export Products in Range
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+            return "";
         }
 
         private static bool IsAttributeValid(object obj)
