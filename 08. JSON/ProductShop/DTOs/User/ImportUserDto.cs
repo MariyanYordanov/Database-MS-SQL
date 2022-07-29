@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProductShop.DTOs.User
 {
@@ -8,7 +9,9 @@ namespace ProductShop.DTOs.User
         [JsonProperty("firstName")]
         public string FirstName { get; set; }
 
+        [Required]
         [JsonProperty("lastName")]
+        [MinLength(3)]
         public string LastName { get; set; }
 
         [JsonProperty("age")]
