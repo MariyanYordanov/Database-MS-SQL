@@ -32,11 +32,6 @@ namespace ProductShop
             this.CreateMap<User, ExportUserWithSoldProductsDto>()
                 .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
 
-            this.CreateMap<Product, ExportSoldProductShortInfoDto>();
-            this.CreateMap<User, ExportSoldProductsFullInfo>()
-                .ForMember(d => d.Products, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
-            this.CreateMap<User, ExportUsersWithFullProductInfoDto>()
-                .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s));
         }
     }
 }

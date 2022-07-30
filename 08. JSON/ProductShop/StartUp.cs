@@ -187,28 +187,36 @@ namespace ProductShop
         // Query 8. Export Users and Products
         public static string GetUsersWithProducts(ProductShopContext context)
         {
-            /* Get all users who have at least 1 sold product with a buyer. 
-             * Order them in descending order by the number of sold products with a buyer. 
-             * Select only their first and last name, age and for each product - name and price. 
-             * Ignore all null values.*/
-            ExportUsersWithFullProductInfoDto[] users = context.Users
-                .Where(u => u.ProductsSold.Any(p => p.BuyerId.HasValue))
-                .OrderByDescending(u => u.ProductsSold.Count(p => p.BuyerId.HasValue))
-                .ProjectTo<ExportUsersWithFullProductInfoDto>()
-                .ToArray();
+            var users = context.Users
+                .Where(u => u.ProductsSold.Count() > 0)
+                .Select(u => new
+                {
+                    usersCount = context.Users.Where(u => u.ProductsSold.Count() > 0).Count(),
+                    users = new
+                    {
+                        firstName = u.FirstName,
+                        lastName = u.LastName,
+                        age = u.Age,
+                        soldProcuts = u.ProductsSold.Select(y => new
+                        {
+                            count = u.ProductsSold.Count(),
+                            products = u.ProductsSold.Select(s => new
+                            {
+                                name = s.Name,
+                                price = s.Price.ToString("f2")
+                            })
+                        })
+                    }
+                })
+                .OrderByDescending(u => u.users.soldProcuts.Count())
+                .ToList();
 
-            ExportUsersInfoDto usersInfoDto = new ExportUsersInfoDto()
-            {
-                UsersCount = users.Length,
-                Users = users,
-            };
-
-            JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
+            var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
             };
 
-            string json = JsonConvert.SerializeObject(usersInfoDto, Formatting.Indented, jsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(users, Formatting.Indented, settings);
 
             return json;
         }
