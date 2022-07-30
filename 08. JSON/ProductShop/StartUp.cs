@@ -28,7 +28,7 @@ namespace ProductShop
             });
 
             ProductShopContext dbContext = new ProductShopContext();
-            InitializeOutputFilePath("categories-by-products.json");
+            InitializeOutputFilePath("users-and-products.json");
 
             //InitialaseDataSetFilePath("categories.json");
             //string inputJson = File.ReadAllText("categories-products.json");
@@ -41,7 +41,7 @@ namespace ProductShop
             //string output = ImportCategoryProducts(dbContext);
             //Console.WriteLine(output);
 
-            string json = GetCategoriesByProductsCount(dbContext);
+            string json = GetUsersWithProducts(dbContext);
             File.WriteAllText(filePath,json);
         }
 
@@ -180,6 +180,35 @@ namespace ProductShop
                 .ToArray();
 
             string json = JsonConvert.SerializeObject(categories, Formatting.Indented);
+
+            return json;
+        }
+
+        // Query 8. Export Users and Products
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            /* Get all users who have at least 1 sold product with a buyer. 
+             * Order them in descending order by the number of sold products with a buyer. 
+             * Select only their first and last name, age and for each product - name and price. 
+             * Ignore all null values.*/
+            ExportUsersWithFullProductInfoDto[] users = context.Users
+                .Where(u => u.ProductsSold.Any(p => p.BuyerId.HasValue))
+                .OrderByDescending(u => u.ProductsSold.Count(p => p.BuyerId.HasValue))
+                .ProjectTo<ExportUsersWithFullProductInfoDto>()
+                .ToArray();
+
+            ExportUsersInfoDto usersInfoDto = new ExportUsersInfoDto()
+            {
+                UsersCount = users.Length,
+                Users = users,
+            };
+
+            JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+
+            string json = JsonConvert.SerializeObject(usersInfoDto, Formatting.Indented, jsonSerializerSettings);
 
             return json;
         }

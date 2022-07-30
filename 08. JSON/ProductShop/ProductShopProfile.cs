@@ -27,18 +27,16 @@ namespace ProductShop
 
             // For 6 task where two DTO's are Nested
             // Child DTO 
-            this.CreateMap<Product, ExportUserSoldProductsDto>()
-                .ForMember(d => d.BuyerFirstName, mo => mo.MapFrom(s => s.Buyer.FirstName))
-                .ForMember(d => d.BuyerLastName, mo => mo.MapFrom(s => s.Buyer.LastName));
-
+            this.CreateMap<Product, ExportUserSoldProductsDto>();
             // Parent DTO 
             this.CreateMap<User, ExportUserWithSoldProductsDto>()
                 .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
 
-            //this.CreateMap<Category, ExportAllCaregory>()
-            //    .ForMember(d => d.ProductsCount, mo => mo.MapFrom(s => s.CategoryProducts.Count()))
-            //    .ForMember(d => d.AveragePrice, mo => mo.MapFrom(s => s.CategoryProducts.Sum(cp => cp.Product.Price) / s.CategoryProducts.Count()))
-            //    .ForMember(d => d.TotalRevenue, mo => mo.MapFrom(s => s.CategoryProducts.Sum(cp => cp.Product.Price)));
+            this.CreateMap<Product, ExportSoldProductShortInfoDto>();
+            this.CreateMap<User, ExportSoldProductsFullInfo>()
+                .ForMember(d => d.Products, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
+            this.CreateMap<User, ExportUsersWithFullProductInfoDto>()
+                .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s));
         }
     }
 }
