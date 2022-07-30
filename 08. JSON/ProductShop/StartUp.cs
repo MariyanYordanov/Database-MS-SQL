@@ -11,11 +11,14 @@ using System.ComponentModel.DataAnnotations;
 using ProductShop.DTOs.Product;
 using ProductShop.DTOs.Category;
 using ProductShop.DTOs.CategoryProduct;
+using AutoMapper.QueryableExtensions;
 
 namespace ProductShop
 {
     public class StartUp
     {
+        private static string filePath;
+
         public static object ImportCategoryProductsDto { get; private set; }
 
         public static void Main(string[] args)
@@ -25,17 +28,23 @@ namespace ProductShop
             });
 
             ProductShopContext dbContext = new ProductShopContext();
+            InitializeOutputFilePath("products-in-range.json");
 
-            string inputJson = File.ReadAllText("../../../Datasets/categories-products.json");
+            //InitialaseDataSetFilePath("categories.json");
+            //string inputJson = File.ReadAllText("categories-products.json");
 
             //dbContext.Database.EnsureDeleted();
             //dbContext.Database.EnsureCreated();
 
             //Console.WriteLine("Datababe copy was created!");
 
-            string output = ImportCategoryProducts(dbContext, inputJson);
-            Console.WriteLine(output);
+            //string output = ImportCategoryProducts(dbContext);
+            //Console.WriteLine(output);
+
+            string json = GetProductsInRange(dbContext);
+            File.WriteAllText(filePath,json);
         }
+
 
         // Query 1.Import Users
         public static string ImportUsers(ProductShopContext context, string inputJson)
@@ -130,7 +139,26 @@ namespace ProductShop
         // Query 5. Export Products in Range
         public static string GetProductsInRange(ProductShopContext context)
         {
-            return "";
+            ExportProductsInRangeDto[] products = context.Products
+                .Where(p => p.Price >= 500 && p.Price <= 1000)
+                .OrderBy(p => p.Price)
+                .ProjectTo<ExportProductsInRangeDto>()
+                .ToArray();
+
+            string json = JsonConvert.SerializeObject(products, Formatting.Indented);
+
+            return json;
+        }
+
+
+        private static void InitialaseDataSetFilePath(string fileName)
+        {
+            filePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../Datasets/", fileName);
+        }
+
+        private static void InitializeOutputFilePath(string fileName)
+        {
+            filePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../Results/", fileName);
         }
 
         private static bool IsAttributeValid(object obj)
