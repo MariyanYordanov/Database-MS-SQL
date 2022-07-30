@@ -28,7 +28,7 @@ namespace ProductShop
             });
 
             ProductShopContext dbContext = new ProductShopContext();
-            InitializeOutputFilePath("users-sold-products.json");
+            InitializeOutputFilePath("categories-by-products.json");
 
             //InitialaseDataSetFilePath("categories.json");
             //string inputJson = File.ReadAllText("categories-products.json");
@@ -41,7 +41,7 @@ namespace ProductShop
             //string output = ImportCategoryProducts(dbContext);
             //Console.WriteLine(output);
 
-            string json = GetSoldProducts(dbContext);
+            string json = GetCategoriesByProductsCount(dbContext);
             File.WriteAllText(filePath,json);
         }
 
@@ -165,7 +165,25 @@ namespace ProductShop
             return json;
         }
 
-        
+        // Query 7. Export Categories by Products Count
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categories = context.Categories
+                .OrderByDescending(c => c.CategoryProducts.Count())
+                .Select(c => new 
+                {
+                    category = c.Name,
+                    productsCount = c.CategoryProducts.Count(),
+                    averagePrice = c.CategoryProducts.Average(p => p.Product.Price).ToString("f2"),
+                    totalRevenue = c.CategoryProducts.Sum(p => p.Product.Price).ToString("f2"),
+                })
+                .ToArray();
+
+            string json = JsonConvert.SerializeObject(categories, Formatting.Indented);
+
+            return json;
+        }
+
         private static void InitialaseDataSetFilePath(string fileName)
         {
             filePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../Datasets/", fileName);

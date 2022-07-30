@@ -35,6 +35,10 @@ namespace ProductShop
             this.CreateMap<User, ExportUserWithSoldProductsDto>()
                 .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
 
+            //this.CreateMap<Category, ExportAllCaregory>()
+            //    .ForMember(d => d.ProductsCount, mo => mo.MapFrom(s => s.CategoryProducts.Count()))
+            //    .ForMember(d => d.AveragePrice, mo => mo.MapFrom(s => s.CategoryProducts.Sum(cp => cp.Product.Price) / s.CategoryProducts.Count()))
+            //    .ForMember(d => d.TotalRevenue, mo => mo.MapFrom(s => s.CategoryProducts.Sum(cp => cp.Product.Price)));
         }
     }
 }
