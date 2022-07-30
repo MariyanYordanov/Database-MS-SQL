@@ -28,7 +28,7 @@ namespace ProductShop
             });
 
             ProductShopContext dbContext = new ProductShopContext();
-            InitializeOutputFilePath("products-in-range.json");
+            InitializeOutputFilePath("users-sold-products.json");
 
             //InitialaseDataSetFilePath("categories.json");
             //string inputJson = File.ReadAllText("categories-products.json");
@@ -41,7 +41,7 @@ namespace ProductShop
             //string output = ImportCategoryProducts(dbContext);
             //Console.WriteLine(output);
 
-            string json = GetProductsInRange(dbContext);
+            string json = GetSoldProducts(dbContext);
             File.WriteAllText(filePath,json);
         }
 
@@ -150,7 +150,22 @@ namespace ProductShop
             return json;
         }
 
+        // Query 6. Export Sold Products
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            ExportUserWithSoldProductsDto[] users = context.Users
+                .Where(u => u.ProductsSold.Any(p => p.BuyerId.HasValue))
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ProjectTo<ExportUserWithSoldProductsDto>()
+                .ToArray();
 
+            string json = JsonConvert.SerializeObject(users, Formatting.Indented);
+
+            return json;
+        }
+
+        
         private static void InitialaseDataSetFilePath(string fileName)
         {
             filePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../Datasets/", fileName);

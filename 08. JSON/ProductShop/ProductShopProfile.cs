@@ -4,6 +4,7 @@ using ProductShop.DTOs.Category;
 using ProductShop.DTOs.Product;
 using ProductShop.DTOs.User;
 using ProductShop.Models;
+using System.Linq;
 
 namespace ProductShop
 {
@@ -23,6 +24,17 @@ namespace ProductShop
                            memberOption => memberOption.MapFrom(
                            sourceMember => $"{sourceMember.Seller.FirstName} " +
                                            $"{sourceMember.Seller.LastName}"));
+
+            // For 6 task where two DTO's are Nested
+            // Child DTO 
+            this.CreateMap<Product, ExportUserSoldProductsDto>()
+                .ForMember(d => d.BuyerFirstName, mo => mo.MapFrom(s => s.Buyer.FirstName))
+                .ForMember(d => d.BuyerLastName, mo => mo.MapFrom(s => s.Buyer.LastName));
+
+            // Parent DTO 
+            this.CreateMap<User, ExportUserWithSoldProductsDto>()
+                .ForMember(d => d.SoldProducts, mo => mo.MapFrom(s => s.ProductsSold.Where(p => p.BuyerId.HasValue)));
+
         }
     }
 }
