@@ -6,6 +6,7 @@ using CarDealer.Dtos.Import;
 using System.Linq;
 using CarDealer.Models;
 using CarDealer.XmlHelper;
+using System.Collections.Generic;
 
 namespace CarDealer
 {
@@ -14,9 +15,9 @@ namespace CarDealer
         public static void Main(string[] args)
         {
             CarDealerContext carDealerContext = new CarDealerContext();
-            string xml = File.ReadAllText("../../../Datasets/parts.xml");
+            string xml = File.ReadAllText("../../../Datasets/cars.xml");
 
-            string result = ImportParts(carDealerContext, xml);
+            string result = ImportCars(carDealerContext, xml);
             Console.WriteLine(result);
             //carDealerContext.Database.EnsureDeleted();
             //carDealerContext.Database.EnsureCreated();
@@ -69,6 +70,42 @@ namespace CarDealer
             return $"Successfully imported {parts.Length}";
         }
 
+        // Query 11. Import Cars
+        public static string ImportCars(CarDealerContext context, string inputXml)
+        {
+            var carsModel = XmlConverter.Deserializer<CarsDto>(inputXml, "Cars");
 
+            var cars = new List<Car>();
+
+            foreach (var car in carsModel)
+            {
+                var partsIds = car.Parts
+                    .Select(x => x.PartId)
+                    .Distinct()
+                    .Where(id => context.Parts.Any(x => x.Id == id))
+                    .ToArray();
+
+                var currCar = new Car()
+                {
+                    Make = car.Make,
+                    Model = car.Model,
+                    TravelledDistance = car.TraveledDistance,
+                    PartCars = partsIds.Select(id => new PartCar()
+                    {
+                        PartId = id,
+                    })
+                    .ToArray()
+                };
+
+                cars.Add(currCar);
+            }
+
+            context.Cars.AddRange(cars);
+            context.SaveChanges();
+
+            return $"Successfully imported {cars.Count}";
+        }
+
+        
     }
 }
