@@ -23,8 +23,8 @@
 
             //string inputXml = File.ReadAllText("../../../Datasets/categories-products.xml");
 
-            string result = GetProductsInRange(dbContext);
-            File.WriteAllText("../../../Outputs/products-in-range.xml", result);
+            string result = GetSoldProducts(dbContext);
+            File.WriteAllText("../../../Outputs/users-sold-products.xml", result);
         }
 
         // Query 1. Import Users
@@ -119,6 +119,30 @@
                 .ToArray();
 
             return XmlConverter.Serialize<ExportProductsInRangeDto>(productsInRange, "Products");
+        }
+
+        // Query 6. Export Sold Products
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            ExportSoldProductsDto[] soldProductsDtos = context.Users
+                .Where(u => u.ProductsSold.Count() > 0)
+                .Select(u => new ExportSoldProductsDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    SoldProducts = u.ProductsSold.Select(sp => new ExportSolddProductInnerDto
+                    {
+                        Name = sp.Name,
+                        Price = sp.Price,
+                    })
+                    .ToArray()
+                })
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .Take(5)
+                .ToArray();
+
+            return XmlConverter.Serialize<ExportSoldProductsDto>(soldProductsDtos, "Users");
         }
 
     }
