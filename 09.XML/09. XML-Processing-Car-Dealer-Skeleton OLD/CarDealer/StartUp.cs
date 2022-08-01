@@ -15,9 +15,9 @@ namespace CarDealer
         public static void Main(string[] args)
         {
             CarDealerContext carDealerContext = new CarDealerContext();
-            string xml = File.ReadAllText("../../../Datasets/customers.xml");
+            string xml = File.ReadAllText("../../../Datasets/sales.xml");
 
-            string result = ImportCustomers(carDealerContext, xml);
+            string result = ImportSales(carDealerContext, xml);
             Console.WriteLine(result);
 
             //carDealerContext.Database.EnsureDeleted();
@@ -125,6 +125,30 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {customers.Length}";
+        }
+
+        // Query 13. Import Sales
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+            var salesDto = XmlConverter.Deserializer<SalesDto>(inputXml, "Sales");
+
+            var carIds = context.Cars.Select(c => c.Id).ToArray();
+
+            var sales = salesDto
+                .Where(s => carIds.Contains(s.CarId))
+                .Select(s => new Sale
+                {
+                    CarId = s.CarId,
+                    CustomerId = s.CustomerId,
+                    Discount = s.Discount,
+
+                })
+                .ToArray();
+
+            context.Sales.AddRange(sales);
+            context.SaveChanges();
+
+            return $"Successfully imported {sales.Length}";
         }
     }
 }
