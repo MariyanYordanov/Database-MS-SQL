@@ -7,6 +7,7 @@ using System.Linq;
 using CarDealer.Models;
 using CarDealer.XmlHelper;
 using System.Collections.Generic;
+using CarDealer.Dtos.Export;
 
 namespace CarDealer
 {
@@ -15,13 +16,18 @@ namespace CarDealer
         public static void Main(string[] args)
         {
             CarDealerContext carDealerContext = new CarDealerContext();
-            string xml = File.ReadAllText("../../../Datasets/sales.xml");
-
-            string result = ImportSales(carDealerContext, xml);
-            Console.WriteLine(result);
 
             //carDealerContext.Database.EnsureDeleted();
             //carDealerContext.Database.EnsureCreated();
+            //Console.WriteLine("Database is ready to work!");
+
+            //string xml = File.ReadAllText("../../../Datasets/sales.xml");
+            //string result = ImportSales(carDealerContext, xml);
+            //Console.WriteLine(result);
+
+            string inputXml = GetCarsFromMakeBmw(carDealerContext);
+            File.WriteAllText("../../../Outputs/bmw-cars.xml", inputXml);
+            Console.WriteLine("The file was created!");
         }
 
         // Query 9. Import Suppliers
@@ -149,6 +155,43 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {sales.Length}";
+        }
+
+        // Query 14. Export Cars With Distance
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Where(c => c.TravelledDistance > 2_000_000)
+                .Select(c => new CarWithDistanceDto
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TravelledDistance = c.TravelledDistance,
+                })
+                .OrderBy(c => c.Make)
+                .ThenBy(c => c.Model)
+                .Take(10)
+                .ToArray();
+
+            return XmlConverter.Serialize<CarWithDistanceDto>(cars, "cars");
+        }
+
+        // Query 15. Export Cars from make BMW
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Where(c => c.Make == "BMW")
+                .Select(c => new CarFromMakeBmwDto
+                {
+                    Id = c.Id,
+                    Model = c.Model,
+                    TravelledDistance = c.TravelledDistance,
+                })
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TravelledDistance)
+                .ToArray();
+
+            return XmlConverter.Serialize<CarFromMakeBmwDto>(cars,"cars");
         }
     }
 }
