@@ -3,7 +3,7 @@
 namespace ProductShop.Dtos.Export
 {
     [XmlType("User")]
-    public class ExportSoldProductsDto
+    public class SoldProductsDto
     {
         [XmlElement("firstName")]
         public string FirstName { get; set; }
@@ -12,6 +12,6 @@ namespace ProductShop.Dtos.Export
         public string LastName { get; set; }
 
         [XmlArray("soldProducts")]
-        public ExportSolddProductInnerDto[] SoldProducts { get; set; }
+        public SolddProductInnerDto[] SoldProducts { get; set; }
     }
 }

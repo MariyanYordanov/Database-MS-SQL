@@ -3,7 +3,7 @@
 namespace ProductShop.Dtos.Export
 {
     [XmlType("Category")]
-    public class ExportCategoriesByProductsCountDto
+    public class CategoriesByProductsCountDto
     {
         [XmlElement("name")]
         public string Name { get; set; }

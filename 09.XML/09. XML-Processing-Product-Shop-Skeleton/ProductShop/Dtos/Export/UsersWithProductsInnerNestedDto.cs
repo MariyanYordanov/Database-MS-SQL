@@ -3,7 +3,7 @@
 namespace ProductShop.Dtos.Export
 {
     [XmlType("Product")]
-    public class ExportSolddProductInnerDto
+    public class UsersWithProductsInnerNestedDto
     {
         [XmlElement("name")]
         public string Name { get; set; }

@@ -18,8 +18,8 @@
 
             //string inputXml = File.ReadAllText("../../../Datasets/categories-products.xml");
 
-            string result = GetCategoriesByProductsCount(dbContext);
-            File.WriteAllText("../../../Outputs/categories-by-products.xml", result);
+            string result = GetUsersWithProducts(dbContext);
+            File.WriteAllText("../../../Outputs/users-and-products.xml", result);
         }
 
         // Query 1. Import Users
@@ -101,9 +101,9 @@
         // Query 5. Export Products In Range
         public static string GetProductsInRange(ProductShopContext context)
         {
-            ExportProductsInRangeDto[] productsInRange = context.Products
+            ProductsInRangeDto[] productsInRange = context.Products
                 .Where(p => p.Price >= 500 && p.Price <= 1000)
-                .Select(p => new ExportProductsInRangeDto
+                .Select(p => new ProductsInRangeDto
                 {
                     Name = p.Name,
                     Price = p.Price,
@@ -113,19 +113,19 @@
                 .Take(10)
                 .ToArray();
 
-            return XmlConverter.Serialize<ExportProductsInRangeDto>(productsInRange, "Products");
+            return XmlConverter.Serialize<ProductsInRangeDto>(productsInRange, "Products");
         }
 
         // Query 6. Export Sold Products
         public static string GetSoldProducts(ProductShopContext context)
         {
-            ExportSoldProductsDto[] soldProductsDtos = context.Users
+            SoldProductsDto[] soldProductsDtos = context.Users
                 .Where(u => u.ProductsSold.Count() > 0)
-                .Select(u => new ExportSoldProductsDto
+                .Select(u => new SoldProductsDto
                 {
                     FirstName = u.FirstName,
                     LastName = u.LastName,
-                    SoldProducts = u.ProductsSold.Select(sp => new ExportSolddProductInnerDto
+                    SoldProducts = u.ProductsSold.Select(sp => new SolddProductInnerDto
                     {
                         Name = sp.Name,
                         Price = sp.Price,
@@ -137,14 +137,14 @@
                 .Take(5)
                 .ToArray();
 
-            return XmlConverter.Serialize<ExportSoldProductsDto>(soldProductsDtos, "Users");
+            return XmlConverter.Serialize<SoldProductsDto>(soldProductsDtos, "Users");
         }
 
         // Query 7. Export Categories By Products Count
         public static string GetCategoriesByProductsCount(ProductShopContext context)
         {
-            ExportCategoriesByProductsCountDto[] dtos = context.Categories
-                .Select(c => new ExportCategoriesByProductsCountDto
+            CategoriesByProductsCountDto[] dtos = context.Categories
+                .Select(c => new CategoriesByProductsCountDto
                 {
                     Name = c.Name,
                     Count = c.CategoryProducts.Count(),
@@ -154,7 +154,43 @@
                 .OrderByDescending(c => c.Count)
                 .ThenBy(c => c.TotalRevenue)
                 .ToArray();
-            return XmlConverter.Serialize<ExportCategoriesByProductsCountDto>(dtos, "Categories");
+            return XmlConverter.Serialize<CategoriesByProductsCountDto>(dtos, "Categories");
+        }
+
+        // Query 8. Export Users and Products
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var usersDto = context.Users
+                .Where(u => u.ProductsSold.Any())
+                .OrderByDescending(u => u.ProductsSold.Count())
+                .Select(u => new UsersWithProductsDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Age = u.Age.Value,
+                    SoldProducts = new UsersWithProductsInnerDto
+                    {
+                        Count = u.ProductsSold.Count(),
+                        Products = u.ProductsSold
+                            .Select(p => new UsersWithProductsInnerNestedDto
+                            {
+                                Name = p.Name,
+                                Price = p.Price,
+                            })
+                            .OrderByDescending(p => p.Price)
+                            .ToArray(),
+                    },
+                })
+                .Take(10)
+                .ToArray();
+
+            var result = new FullDto
+            {
+                Count = context.Users.Where(x => x.ProductsSold.Any()).Count(),
+                Users = usersDto,
+            };
+
+            return XmlConverter.Serialize<FullDto>(result, "Users");
         }
     }
 }
