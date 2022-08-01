@@ -25,8 +25,8 @@ namespace CarDealer
             //string result = ImportSales(carDealerContext, xml);
             //Console.WriteLine(result);
 
-            string inputXml = GetTotalSalesByCustomer(carDealerContext);
-            File.WriteAllText("../../../Outputs/customers-total-sales.xml", inputXml);
+            string inputXml = GetSalesWithAppliedDiscount(carDealerContext);
+            File.WriteAllText("../../../Outputs/sales-discounts.xml", inputXml);
             Console.WriteLine("The file was created!");
         }
 
@@ -253,6 +253,30 @@ namespace CarDealer
                 .ToArray();
 
             return XmlConverter.Serialize<TotalSalesExportDto>(customers, "customers");
+        }
+
+        // Query 19. Export Sales with Applied Discount
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var sales = context.Sales
+                .Select(s => new SalesDiscountsExportDto
+                {
+                    CarModel = new SalesDiscountCarAttributeExportDto
+                    {
+                        Make = s.Car.Make,
+                        Model = s.Car.Model,
+                        TravelledDistance = s.Car.TravelledDistance,
+                    },
+
+                    Discount = s.Discount,
+                    CustomerName = s.Customer.Name,
+                    Price = s.Car.PartCars.Sum(pc => pc.Part.Price),
+                    PriceWithDiscount = s.Car.PartCars
+                        .Sum(pc => pc.Part.Price) * (1 - s.Discount / 100)
+                })
+                .ToArray();
+
+            return XmlConverter.Serialize<SalesDiscountsExportDto>(sales, "sales");
         }
     }
 }
