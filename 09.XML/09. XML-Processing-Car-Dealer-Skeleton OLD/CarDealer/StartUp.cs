@@ -25,8 +25,8 @@ namespace CarDealer
             //string result = ImportSales(carDealerContext, xml);
             //Console.WriteLine(result);
 
-            string inputXml = GetLocalSuppliers(carDealerContext);
-            File.WriteAllText("../../../Outputs/local-suppliers.xml", inputXml);
+            string inputXml = GetTotalSalesByCustomer(carDealerContext);
+            File.WriteAllText("../../../Outputs/customers-total-sales.xml", inputXml);
             Console.WriteLine("The file was created!");
         }
 
@@ -233,6 +233,26 @@ namespace CarDealer
                 .ToArray();
 
             return XmlConverter.Serialize<CarsListPartsExportDto>(cars, "cars");
+        }
+
+        // Query 18. Export Total Sales by Customer
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .Where(c => c.Sales.Any())
+                .Select(c => new TotalSalesExportDto
+                {
+                    FullName = c.Name,
+                    BoughtCars = c.Sales.Count(),
+                    SpentMoney = c.Sales
+                        .Select(c => c.Car)
+                        .SelectMany(c => c.PartCars)
+                        .Sum(c => c.Part.Price)
+                })
+                .OrderByDescending(c => c.SpentMoney)
+                .ToArray();
+
+            return XmlConverter.Serialize<TotalSalesExportDto>(customers, "customers");
         }
     }
 }
