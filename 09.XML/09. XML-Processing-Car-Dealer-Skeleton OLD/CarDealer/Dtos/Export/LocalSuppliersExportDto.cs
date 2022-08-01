@@ -2,8 +2,8 @@
 
 namespace CarDealer.Dtos.Export
 {
-    [XmlType("suppliers")]
-    public class LocalSuppliersDto
+    [XmlType("suplier")]
+    public class LocalSuppliersExportDto
     {
         [XmlAttribute("id")]
         public int Id { get; set; }

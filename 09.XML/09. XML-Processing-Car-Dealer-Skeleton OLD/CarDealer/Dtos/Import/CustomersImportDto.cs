@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 namespace CarDealer.Dtos.Import
 {
     [XmlType("Customer")]
-    public class CustomersDto
+    public class CustomersImportDto
     {
         [XmlElement("name")]
         public string Name { get; set; }

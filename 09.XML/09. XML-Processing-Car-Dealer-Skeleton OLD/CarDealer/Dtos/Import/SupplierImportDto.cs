@@ -3,7 +3,7 @@
 namespace CarDealer.Dtos.Import
 {
     [XmlType(TypeName ="Supplier")]
-    public class SupplierDto
+    public class SupplierImportDto
     {
         [XmlElement(ElementName ="name")]
         public string Name { get; set; }

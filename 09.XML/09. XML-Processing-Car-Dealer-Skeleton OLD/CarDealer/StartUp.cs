@@ -35,7 +35,7 @@ namespace CarDealer
         {
             const string root = "Suppliers";
 
-            var suppliersDto = XmlConverter.Deserializer<SupplierDto>(inputXml, root);
+            var suppliersDto = XmlConverter.Deserializer<SupplierImportDto>(inputXml, root);
 
             Supplier[] suppliers = suppliersDto
                 .Select(dto => new Supplier
@@ -56,7 +56,7 @@ namespace CarDealer
         {
             const string root = "Parts";
 
-            var partsDtos = XmlConverter.Deserializer<PartsDto>(inputXml, root);
+            var partsDtos = XmlConverter.Deserializer<PartsImportDto>(inputXml, root);
 
             var validId = context.Suppliers.Select(s => s.Id).ToArray();
 
@@ -80,7 +80,7 @@ namespace CarDealer
         // Query 11. Import Cars
         public static string ImportCars(CarDealerContext context, string inputXml)
         {
-            var carsModel = XmlConverter.Deserializer<CarsDto>(inputXml, "Cars");
+            var carsModel = XmlConverter.Deserializer<CarsImportDto>(inputXml, "Cars");
 
             var cars = new List<Car>();
 
@@ -116,7 +116,7 @@ namespace CarDealer
         // Query 12. Import Customers
         public static string ImportCustomers(CarDealerContext context, string inputXml)
         {
-            var customersModel = XmlConverter.Deserializer<CustomersDto>(inputXml, "Customers");
+            var customersModel = XmlConverter.Deserializer<CustomersImportDto>(inputXml, "Customers");
 
             var customers = customersModel
                 .Select(c => new Customer
@@ -136,7 +136,7 @@ namespace CarDealer
         // Query 13. Import Sales
         public static string ImportSales(CarDealerContext context, string inputXml)
         {
-            var salesDto = XmlConverter.Deserializer<SalesDto>(inputXml, "Sales");
+            var salesDto = XmlConverter.Deserializer<SalesImportDto>(inputXml, "Sales");
 
             var carIds = context.Cars.Select(c => c.Id).ToArray();
 
@@ -162,7 +162,7 @@ namespace CarDealer
         {
             var cars = context.Cars
                 .Where(c => c.TravelledDistance > 2_000_000)
-                .Select(c => new CarWithDistanceDto
+                .Select(c => new CarWithDistanceExportDto
                 {
                     Make = c.Make,
                     Model = c.Model,
@@ -173,7 +173,7 @@ namespace CarDealer
                 .Take(10)
                 .ToArray();
 
-            return XmlConverter.Serialize<CarWithDistanceDto>(cars, "cars");
+            return XmlConverter.Serialize<CarWithDistanceExportDto>(cars, "cars");
         }
 
         // Query 15. Export Cars from make BMW
@@ -181,7 +181,7 @@ namespace CarDealer
         {
             var cars = context.Cars
                 .Where(c => c.Make == "BMW")
-                .Select(c => new CarFromMakeBmwDto
+                .Select(c => new CarFromMakeBmwExportDto
                 {
                     Id = c.Id,
                     Model = c.Model,
@@ -191,7 +191,7 @@ namespace CarDealer
                 .ThenByDescending(c => c.TravelledDistance)
                 .ToArray();
 
-            return XmlConverter.Serialize<CarFromMakeBmwDto>(cars,"cars");
+            return XmlConverter.Serialize<CarFromMakeBmwExportDto>(cars,"cars");
         }
 
         // Query 16. Export Local Suppliers
@@ -199,14 +199,40 @@ namespace CarDealer
         {
             var suppliers = context.Suppliers
                 .Where(s => !s.IsImporter)
-                .Select(s => new LocalSuppliersDto
+                .Select(s => new LocalSuppliersExportDto
                 {
                     Id = s.Id,
                     Name = s.Name,
                     PartsCount = s.Parts.Count(),
                 })
                 .ToArray();
-            return XmlConverter.Serialize<LocalSuppliersDto>(suppliers, "suppliers");
+            return XmlConverter.Serialize<LocalSuppliersExportDto>(suppliers, "suppliers");
+        }
+
+        // Query 17. Export Cars with Their List of Parts
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Select(c => new CarsListPartsExportDto
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TraveledDistance = c.TravelledDistance,
+                    PartsList = c.PartCars
+                        .Select(p => new CarListPartsNestedExportDto
+                        {
+                            Name = p.Part.Name,
+                            Price = p.Part.Price,
+                        })
+                        .OrderByDescending(p => p.Price)
+                        .ToArray()
+                })
+                .OrderByDescending(c => c.TraveledDistance)
+                .ThenBy(c => c.Model)
+                .Take(5)
+                .ToArray();
+
+            return XmlConverter.Serialize<CarsListPartsExportDto>(cars, "cars");
         }
     }
 }

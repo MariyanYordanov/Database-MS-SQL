@@ -3,7 +3,7 @@
 namespace CarDealer.Dtos.Import
 {
     [XmlType("Sale")]
-    public class SalesDto
+    public class SalesImportDto
     {
         [XmlElement("carId")]
         public int CarId { get; set; }
