@@ -2,8 +2,6 @@
 {
     using System.IO;
     using System.Linq;
-    using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using CarDealer.XmlHelper;
     using ProductShop.Data;
     using ProductShop.Dtos.Export;
@@ -12,9 +10,6 @@
 
     public class StartUp
     {
-        static IMapper mapper;
-
-        
         public static void Main(string[] args)
         {
             ProductShopContext dbContext = new ProductShopContext();
@@ -23,8 +18,8 @@
 
             //string inputXml = File.ReadAllText("../../../Datasets/categories-products.xml");
 
-            string result = GetSoldProducts(dbContext);
-            File.WriteAllText("../../../Outputs/users-sold-products.xml", result);
+            string result = GetCategoriesByProductsCount(dbContext);
+            File.WriteAllText("../../../Outputs/categories-by-products.xml", result);
         }
 
         // Query 1. Import Users
@@ -145,5 +140,21 @@
             return XmlConverter.Serialize<ExportSoldProductsDto>(soldProductsDtos, "Users");
         }
 
+        // Query 7. Export Categories By Products Count
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            ExportCategoriesByProductsCountDto[] dtos = context.Categories
+                .Select(c => new ExportCategoriesByProductsCountDto
+                {
+                    Name = c.Name,
+                    Count = c.CategoryProducts.Count(),
+                    AveragePrice = c.CategoryProducts.Average(p => p.Product.Price),
+                    TotalRevenue = c.CategoryProducts.Sum(cp => cp.Product.Price),
+                })
+                .OrderByDescending(c => c.Count)
+                .ThenBy(c => c.TotalRevenue)
+                .ToArray();
+            return XmlConverter.Serialize<ExportCategoriesByProductsCountDto>(dtos, "Categories");
+        }
     }
 }
