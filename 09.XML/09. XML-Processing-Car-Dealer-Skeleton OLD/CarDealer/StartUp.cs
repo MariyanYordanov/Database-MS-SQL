@@ -25,8 +25,8 @@ namespace CarDealer
             //string result = ImportSales(carDealerContext, xml);
             //Console.WriteLine(result);
 
-            string inputXml = GetCarsFromMakeBmw(carDealerContext);
-            File.WriteAllText("../../../Outputs/bmw-cars.xml", inputXml);
+            string inputXml = GetLocalSuppliers(carDealerContext);
+            File.WriteAllText("../../../Outputs/local-suppliers.xml", inputXml);
             Console.WriteLine("The file was created!");
         }
 
@@ -192,6 +192,21 @@ namespace CarDealer
                 .ToArray();
 
             return XmlConverter.Serialize<CarFromMakeBmwDto>(cars,"cars");
+        }
+
+        // Query 16. Export Local Suppliers
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context.Suppliers
+                .Where(s => !s.IsImporter)
+                .Select(s => new LocalSuppliersDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    PartsCount = s.Parts.Count(),
+                })
+                .ToArray();
+            return XmlConverter.Serialize<LocalSuppliersDto>(suppliers, "suppliers");
         }
     }
 }
