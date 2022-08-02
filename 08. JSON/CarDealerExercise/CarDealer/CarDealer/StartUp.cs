@@ -20,12 +20,12 @@ namespace CarDealer
             });
 
             CarDealerContext dbContext = new CarDealerContext();
-            //dbContext.Database.EnsureDeleted();
-            //dbContext.Database.EnsureCreated();
-            //Console.WriteLine("Datababe copy was created!");
+            dbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureCreated();
+            Console.WriteLine("Datababe copy was created!");
 
-            string inputJson = File.ReadAllText("../../../Datasets/suppliers.json");
-            string output = ImportSuppliers(dbContext, inputJson);
+            string inputJson = File.ReadAllText("../../../Datasets/cars.json");
+            string output = ImportCars(dbContext, inputJson);
             Console.WriteLine(output);
 
             //string json = GetUsersWithProducts(dbContext);
@@ -54,6 +54,67 @@ namespace CarDealer
 
             return $"Successfully imported {validSuppliers.Count}.";
         }
+
+        // Query 10. Import Parts
+        public static string ImportParts(CarDealerContext context, string inputJson)
+        {
+            PartsImportDto[] partsDtos = JsonConvert.DeserializeObject<PartsImportDto[]>(inputJson);
+            ICollection<Part> parts = new List<Part>();
+            foreach (var pDtos in partsDtos)
+            {
+                if (!IsAttributeValid(pDtos))
+                {
+                    continue;
+                }
+
+                Part part = Mapper.Map<Part>(pDtos);
+                if ( !context.Suppliers.Select(x => x.Id).Contains(part.SupplierId))
+                {
+                    continue;
+                }
+
+                parts.Add(part);
+            }
+
+            context.Parts.AddRange(parts);
+            context.SaveChanges();
+
+            return $"Successfully imported {parts.Count}.";
+        }
+
+        // Query 11. Import Cars
+        public static string ImportCars(CarDealerContext context, string inputJson)
+        {
+            CarsImportDto[] carsDtos = JsonConvert.DeserializeObject<CarsImportDto[]>(inputJson);
+            List<Car> cars = new List<Car>();
+            foreach (var dtoCar in carsDtos)
+            {
+                Car car = new Car
+                {
+                    Make = dtoCar.Make,
+                    Model = dtoCar.Model,
+                    TravelledDistance = dtoCar.TravelledDistance,
+                };
+
+                foreach (int partId in dtoCar.PartsId.Distinct())
+                {
+                    car.PartCars.Add(new PartCar
+                    {
+                        PartId = partId
+                    });
+                }
+
+                cars.Add(car);
+            }
+
+            context.Cars.AddRange(cars);
+            context.SaveChanges();
+
+            return $"Successfully imported {cars.Count()}.";
+        }
+
+
+
 
         private static bool IsAttributeValid(object obj)
         {
