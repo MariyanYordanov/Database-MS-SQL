@@ -24,8 +24,8 @@ namespace CarDealer
             dbContext.Database.EnsureCreated();
             Console.WriteLine("Datababe copy was created!");
 
-            string inputJson = File.ReadAllText("../../../Datasets/cars.json");
-            string output = ImportCars(dbContext, inputJson);
+            string inputJson = File.ReadAllText("../../../Datasets/sales.json");
+            string output = ImportSales(dbContext, inputJson);
             Console.WriteLine(output);
 
             //string json = GetUsersWithProducts(dbContext);
@@ -111,6 +111,62 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {cars.Count()}.";
+        }
+
+        // Query 12. Import Customers
+        public static string ImportCustomers(CarDealerContext context, string inputJson)
+        {
+            CustomersImportDto[] customersDtos = JsonConvert.DeserializeObject<CustomersImportDto[]>(inputJson);
+            ICollection<Customer> customers = new List<Customer>();
+            foreach (var cDto in customersDtos)
+            {
+                if (!IsAttributeValid(cDto))
+                {
+                    continue;
+                }
+
+                Customer customer = new Customer
+                {
+                    Name = cDto.Name,
+                    BirthDate = cDto.BirthDate,
+                    IsYoungDriver = cDto.IsYoungDriver,
+                };
+
+                customers.Add(customer);
+            }
+
+            context.AddRange(customers);
+            context.SaveChanges();
+
+            return $"Successfully imported {customers.Count}.";
+        }
+
+        // Query 13. Import Sales
+        public static string ImportSales(CarDealerContext context, string inputJson)
+        {
+            SalesImportDto[] salesDtos = JsonConvert.DeserializeObject<SalesImportDto[]>(inputJson);
+            ICollection<Sale> sales = new List<Sale>();
+            foreach (var sDto in salesDtos)
+            {
+                if (!IsAttributeValid(sDto))
+                {
+                    continue;
+                }
+
+                Sale sale = new Sale
+                {
+                    CarId = sDto.CarId,
+                    CustomerId = sDto.CustomerId,
+                    Discount = sDto.Discount,
+                };
+
+                sales.Add(sale);
+            }
+
+            context.AddRange(sales);
+            context.SaveChanges();
+
+            return $"Successfully imported {sales.Count}.";
         }
 
 
