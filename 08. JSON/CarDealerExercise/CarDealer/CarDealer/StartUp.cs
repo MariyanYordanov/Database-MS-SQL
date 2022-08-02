@@ -20,16 +20,16 @@ namespace CarDealer
             });
 
             CarDealerContext dbContext = new CarDealerContext();
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-            Console.WriteLine("Datababe copy was created!");
+            //dbContext.Database.EnsureDeleted();
+            //dbContext.Database.EnsureCreated();
+            //Console.WriteLine("Datababe copy was created!");
 
-            string inputJson = File.ReadAllText("../../../Datasets/sales.json");
-            string output = ImportSales(dbContext, inputJson);
-            Console.WriteLine(output);
+            //string inputJson = File.ReadAllText("../../../Datasets/sales.json");
+            //string output = ImportSales(dbContext, inputJson);
+            //Console.WriteLine(output);
 
-            //string json = GetUsersWithProducts(dbContext);
-            //File.WriteAllText(filePath, json);
+            string json = GetCarsFromMakeToyota(dbContext);
+            File.WriteAllText("../../../Outputs/toyota-cars.json",json);
         }
 
 
@@ -169,7 +169,43 @@ namespace CarDealer
             return $"Successfully imported {sales.Count}.";
         }
 
+        // Query 14. Export Ordered Customers
+        public static string GetOrderedCustomers(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .Select(c => new 
+                {
+                    c.Name,
+                    c.BirthDate,
+                    c.IsYoungDriver,
+                })
+                .OrderBy(c => c.BirthDate)
+                .ThenByDescending(c => c.IsYoungDriver)
+                .ToArray();
 
+            var settings = new JsonSerializerSettings { DateFormatString = "dd/MM/yyyy" };
+
+            return JsonConvert.SerializeObject(customers, Formatting.Indented, settings);
+        }
+
+        // Query 15. Export Cars from Make Toyota
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            var toyotas = context.Cars
+                .Where(c => c.Make == "Toyota")
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Make,
+                    c.Model,
+                    c.TravelledDistance,
+                })
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TravelledDistance)
+                .ToArray();
+
+            return JsonConvert.SerializeObject(toyotas, Formatting.Indented);
+        }
 
 
         private static bool IsAttributeValid(object obj)
