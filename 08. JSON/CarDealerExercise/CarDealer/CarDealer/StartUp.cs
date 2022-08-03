@@ -28,8 +28,8 @@ namespace CarDealer
             //string output = ImportSales(dbContext, inputJson);
             //Console.WriteLine(output);
 
-            string json = GetCarsFromMakeToyota(dbContext);
-            File.WriteAllText("../../../Outputs/toyota-cars.json",json);
+            string json = GetCarsWithTheirListOfParts(dbContext);
+            File.WriteAllText("../../../Outputs/cars-and-parts.json", json);
         }
 
 
@@ -207,6 +207,46 @@ namespace CarDealer
             return JsonConvert.SerializeObject(toyotas, Formatting.Indented);
         }
 
+        // Query 16. Export Local Suppliers
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context.Suppliers
+                .Where(s => !s.IsImporter)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    PartsCount = s.Parts.Count,
+                })
+                .ToArray();
+
+            return JsonConvert.SerializeObject(suppliers, Formatting.Indented);
+        }
+
+        // Query 17. Export Cars with Their List of Parts
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Select(c => new
+                {
+                    car = new
+                    {
+                        c.Make,
+                        c.Model,
+                        c.TravelledDistance,
+                    },
+                    parts = c.PartCars
+                        .Select(pc => new 
+                        {
+                            Name = pc.Part.Name,
+                            Price = pc.Part.Price.ToString("f2"),
+                        })
+                        .ToArray(),
+                })
+                .ToArray();
+
+            return JsonConvert.SerializeObject(cars, Formatting.Indented);
+        }
 
         private static bool IsAttributeValid(object obj)
         {
