@@ -28,8 +28,8 @@ namespace CarDealer
             //string output = ImportSales(dbContext, inputJson);
             //Console.WriteLine(output);
 
-            string json = GetCarsWithTheirListOfParts(dbContext);
-            File.WriteAllText("../../../Outputs/cars-and-parts.json", json);
+            string json = GetTotalSalesByCustomer(dbContext);
+            File.WriteAllText("../../../Outputs/customers-total-sales.json", json);
         }
 
 
@@ -247,6 +247,28 @@ namespace CarDealer
 
             return JsonConvert.SerializeObject(cars, Formatting.Indented);
         }
+
+        // Query 18. Export Total Sales by Customer
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .Where(c => c.Sales.Count > 0)
+                .Select(c => new
+                {
+                    fullName = c.Name,
+                    boughtCars = c.Sales.Count,
+                    spentMoney = Decimal.Parse(c.Sales
+                        .Select(s => s.Car)
+                        .SelectMany(s => s.PartCars)
+                        .Sum(s => s.Part.Price).ToString("f2"))
+                })
+                .OrderByDescending(c => c.spentMoney)
+                .ThenByDescending(c => c.boughtCars)
+                .ToArray();
+
+            return JsonConvert.SerializeObject(customers, Formatting.Indented);
+        }
+
 
         private static bool IsAttributeValid(object obj)
         {
