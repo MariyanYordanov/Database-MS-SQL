@@ -1,0 +1,38 @@
+Successfully imported despatcher - Genadi Petrov with 0 trucks.
+Successfully imported despatcher - Kosta Slavov with 0 trucks.
+Invalid data!
+Invalid data!
+Successfully imported despatcher - Stefan Dragomirov with 0 trucks.
+Successfully imported despatcher - Veselin Daskalov with 0 trucks.
+Successfully imported despatcher - Stela Stefanova with 0 trucks.
+Successfully imported despatcher - Ana Ivanova with 0 trucks.
+Invalid data!
+Successfully imported despatcher - Desislava Hristova with 0 trucks.
+Successfully imported despatcher - Kalina Petrova with 0 trucks.
+Invalid data!
+Successfully imported despatcher - Hristo Ivanov with 0 trucks.
+Successfully imported despatcher - Ivan Hristov with 0 trucks.
+Invalid data!
+Successfully imported despatcher - Ivan Petrov with 0 trucks.
+Successfully imported despatcher - Borislav Petrov with 0 trucks.
+Successfully imported despatcher - Ivan Borislavov with 0 trucks.
+Successfully imported despatcher - Boris Todorov with 0 trucks.
+Successfully imported despatcher - Atanas Petrov with 0 trucks.
+Successfully imported despatcher - Georgi Stefanov with 0 trucks.
+Successfully imported despatcher - Vladimir Hristov with 0 trucks.
+Successfully imported despatcher - Dobromir Plamenov with 0 trucks.
+Invalid data!
+Successfully imported despatcher - Miahela Eneva with 0 trucks.
+Successfully imported despatcher - Polina Kostadinova with 0 trucks.
+Successfully imported despatcher - Vladislav Dobromirov with 0 trucks.
+Successfully imported despatcher - Georgi Atanasov with 0 trucks.
+Successfully imported despatcher - Asen Hristov with 0 trucks.
+Invalid data!
+Successfully imported despatcher - Todor Petrov with 0 trucks.
+Successfully imported despatcher - Petko Todorov with 0 trucks.
+Successfully imported despatcher - Ekaterina Hristova with 0 trucks.
+Successfully imported despatcher - Hristina Petrova with 0 trucks.
+Successfully imported despatcher - Apostol Dobromirov with 0 trucks.
+Successfully imported despatcher - Grigor Petrov with 0 trucks.
+Successfully imported despatcher - Simeon Ivanov with 0 trucks.
+Invalid data!
